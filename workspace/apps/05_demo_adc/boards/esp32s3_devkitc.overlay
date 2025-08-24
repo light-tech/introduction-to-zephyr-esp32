@@ -5,7 +5,7 @@
     };
 };
 
-// ADC1 (adc0) channel 0 is connected to GPIO1
+// ADC1 (adc0) channel 0 is connected to GPIO36
 &adc0 {
     status = "okay";
     #address-cells = <1>;
