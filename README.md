@@ -66,7 +66,7 @@ Now we can do
 ```sh
 python -m esptool --port "<PORT>" --chip auto --baud 921600 --before default_reset --after hard_reset write_flash -u --flash_mode keep --flash_freq 40m --flash_size detect 0x1000 workspace/apps/01_demo_blink/build/zephyr/zephyr.bin
 ```
-where `<PORT>` should be the COM port of your ESP32 DevKit assigned by Windows (check it in Device Manager).
+where `<PORT>` should be the COM port of your ESP32 DevKit assigned by Windows (check it in Device Manager). If you wonder how we find this command, try out `west flash` in WSL. Note [the subtle address difference](https://developer.espressif.com/blog/esp32-bootstrapping/) `0x1000` here instead of `0x0` in the ESP32-S3!
 
 It there is flashing error, you can try reset the device into bootloader mode by holding the *BOOT* button and pressing and releasing the *RESET* button and finally release the *BOOT* button.
 
