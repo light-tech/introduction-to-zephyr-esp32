@@ -17,7 +17,7 @@
         polling-mode;
 
         button_0: d5 {
-            gpios = <&pcf8574 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+            gpios = <&pcf8574 5 GPIO_ACTIVE_LOW>;
         };
     };
 };
