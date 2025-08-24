@@ -1,0 +1,36 @@
+/ {
+    aliases {
+        my-led = &led0;
+        my-button = &button_0;
+    };
+
+    leds {
+        compatible = "gpio-leds";
+        led0: d2 {
+            gpios = <&pcf8574 2 GPIO_ACTIVE_HIGH>;
+        };
+    };
+
+    buttons {
+        compatible = "gpio-keys";
+        debounce-interval-ms = <50>;
+        polling-mode;
+
+        button_0: d5 {
+            gpios = <&pcf8574 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        };
+    };
+};
+
+&i2c0 {
+	status = "okay";
+
+	pcf8574: pcf8574@27 {
+		compatible = "nxp,pcf857x";
+		reg = <0x27>;
+		status = "okay";
+		ngpios = <8>;
+        #gpio-cells = <2>;
+        gpio-controller;
+	};
+};

@@ -27,12 +27,14 @@ int main(void)
 	// Set the LED as output (apply extra flags if needed)
 	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT);
 	if (ret < 0) {
+		printk("ERROR: cannot configure LED GPIO %d\r\n", ret);
 		return 0;
 	}
 
 	// Set the button as input (apply extra flags if needed)
 	ret = gpio_pin_configure_dt(&btn, GPIO_INPUT);
 	if (ret < 0) {
+		printk("ERROR: cannot configure button GPIO %d\r\n", ret);
 		return 0;
 	}
 
