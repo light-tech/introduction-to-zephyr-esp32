@@ -1,0 +1,38 @@
+/ {
+    aliases {
+        my-led = &l0;
+        my-button = &button_0;
+    };
+
+    leds {
+        compatible = "gpio-leds";
+        l0: d2 {
+            gpios = <&pcf8574 2 GPIO_ACTIVE_HIGH>;
+        };
+    };
+
+    buttons {
+        compatible = "gpio-keys";
+        debounce-interval-ms = <50>;
+        polling-mode;
+
+        button_0: d5 {
+            gpios = <&pcf8574 5 GPIO_ACTIVE_LOW>;
+        };
+    };
+};
+
+// From boards/others/promicro_nrf52840/promicro_nrf52840-pinctrl.dtsi
+// Defaul pins for I2C0: SDA 1.00, SCL 0.11
+&i2c0 {
+	status = "okay";
+
+	pcf8574: pcf8574@20 {
+		compatible = "nxp,pcf857x";
+		reg = <0x20>;
+		status = "okay";
+		ngpios = <8>;
+        #gpio-cells = <2>;
+        gpio-controller;
+	};
+};
