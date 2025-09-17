@@ -78,6 +78,80 @@ Run this
 python -m serial.tools.miniterm "<PORT>" 115200
 ```
 
+## Step Through Debugging
+
+Unlike the S3 DevKit, the ESP32 does not come with JTAG debugging port so we won't be able to follow [Part 7](https://www.youtube.com/watch?v=XGTtMYa7IiM&list=PLEBQazB0HUyTmK2zdwhaf8bLwuEaDH-52&index=7) [as is](https://www.digikey.com/en/maker/tutorials/2025/introduction-to-zephyr-part-7-debugging-with-openocd-and-gdb). Several alternatives using the similar FT2322H as the official [ESP-Prog](https://docs.espressif.com/projects/esp-iot-solution/en/latest/hw-reference/ESP-Prog_guide.html) are suggested at https://medium.com/@manuel.bl/low-cost-esp32-in-circuit-debugging-dbbee39e508b but unlike the article, I found that they are _as expensive as_ the ESP-Prog and the unit I got never run.
+
+Luckily, I found yet another alternative here https://medium.com/@mjyai/debugging-esp32-using-2-s2-mini-via-jtag-5e9fccc1ff5b.
+The [S2 Mini](https://www.wemos.cc/en/latest/s2/s2_mini.html) is still cheap as of this writing. The article is for PlatformIO so we need to adapt to Zephyr.
+
+### The debugger firmware
+
+If you don't mind installing the entire ESP-IDF, you can clone the [esp-usb-bridge](https://github.com/espressif/esp-usb-bridge) project and follow [the instruction](https://github.com/espressif/esp-usb-bridge?tab=readme-ov-file#how-to-compile-the-project) to build and flash it to the S2 Mini.
+
+To save time, I also have the prebuilt firmware [here](). With it, simply run
+```
+python -m esptool --chip esp32s2 -b 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_size 2MB --flash_freq 80m 0x1000 build\bootloader\bootloader.bin 0x8000 build\partition_table\partition-table.bin 0x10000 build\bridge.bin
+```
+to flash, just like Zephyr application. No extra tool required. (You may need to put the device into bootloader mode first. When I got the unit, plugging into the USB did not do anything and the LED did not light up so I thought it was dead. But then I pressed both buttons, released them and the COM port showed up in my computer.)
+
+I kept Espressif's VID and PID to avoid changing OpenOCD configuration. For the GPIO choice, I purposely used the outer pins of the S2 Mini so that you can simply solder the two outer headers and can use it on the breadboad
+
+![JTAG GPIO pin selection](.images/esp_usb_brigde_config1.png)
+![Other GPIO pin selection](.images/esp_usb_brigde_config2.png)
+
+The instruction following will assume this pin selection. In case you compile the firmware yourself, please adapt to your own config.
+
+If you see
+```
+Error: ESP32-S2FNR2 (revision v1.0) chip was placed into download mode using GPIO0.
+esptool.py can not exit the download mode over USB. To run the app, reset the chip manually.
+To suppress this note, set --after option to 'no_reset'.
+```
+then worry not. As long as the
+```
+Hash of data verified.
+```
+are printed out, we are fine. Just press the `RST` button on the S2 Mini to manually reset it and run the debugger firmware we just flash.
+
+### Connection
+
+Now we can connect
+
+| JTAG pin | S2 Mini  | ESP32    |
+| :------- | :------: | -------: |
+| TDI      | 33       | 12       |
+| TDO      | 35       | 15       |
+| TCK      | 37       | 13       |
+| TMS      | 39       | 14       |
+
+(Refer to the above image for the pin selection in the firmware.)
+
+### OpenOCD fix
+
+After downloading and extracting [openocd](), we need to fix a configuration file for it to work.
+Open the file `openocd/scripts/interface/esp_usb_bridge.cfg` and delete the part after the `#` sign on the line
+```
+espusbjtag caps_descriptor 0x030A  # string descriptor index:10
+```
+so it should read
+```
+espusbjtag caps_descriptor 0x030A
+```
+These config files are not shell scripts and do not accept line comments like that.
+
+![OpenOCD configuration file fix](.images/openocd_cfg_fix.png)
+
+### Running OpenOCD
+
+Now we can finally run
+
+```
+openocd -f board/esp32-bridge.cfg
+```
+
+and continue with the episode.
+
 ## License
 
 All software in this repository, unless otherwise noted, is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) license.
