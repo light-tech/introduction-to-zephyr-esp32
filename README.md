@@ -89,7 +89,7 @@ The [S2 Mini](https://www.wemos.cc/en/latest/s2/s2_mini.html) is still cheap as 
 
 If you don't mind installing the entire ESP-IDF, you can clone the [esp-usb-bridge](https://github.com/espressif/esp-usb-bridge) project and follow [the instruction](https://github.com/espressif/esp-usb-bridge?tab=readme-ov-file#how-to-compile-the-project) to build and flash it to the S2 Mini.
 
-To save time, I also have the prebuilt firmware [here](). With it, simply run
+To save time, I also have the prebuilt firmware [here](https://github.com/light-tech/introduction-to-zephyr-esp32/releases/download/v1.1.0/esp-usb-bridge-1.1.0.zip). With it, simply run
 ```
 python -m esptool --chip esp32s2 -b 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_size 2MB --flash_freq 80m 0x1000 build\bootloader\bootloader.bin 0x8000 build\partition_table\partition-table.bin 0x10000 build\bridge.bin
 ```
@@ -129,7 +129,7 @@ Now we can connect
 
 ### OpenOCD fix
 
-After downloading and extracting [openocd](), we need to fix a configuration file for it to work.
+After downloading and extracting [openocd](https://openocd.org/), we need to fix a configuration file for it to work.
 Open the file `openocd/scripts/interface/esp_usb_bridge.cfg` and delete the part after the `#` sign on the line
 ```
 espusbjtag caps_descriptor 0x030A  # string descriptor index:10
