@@ -147,10 +147,30 @@ These config files are not shell scripts and do not accept line comments like th
 Now we can finally run
 
 ```
-openocd -f board/esp32-bridge.cfg
+openocd -f board/esp32-bridge.cfg -c "bindto 0.0.0.0"
 ```
 
-and continue with the episode.
+and continue with the episode
+
+```
+$ZEPHYR_SDK_INSTALL_DIR/xtensa-espressif_esp32_zephyr-elf/bin/xtensa-espressif_esp32_zephyr-elf-gdb build/zephyr/zephyr.elf
+```
+
+(Note that we use `esp32` and not `esp32s3`!)
+
+The extra command `bindto` is to instruct `openocd` to listen to all interfaces and not just localhost `127.0.0.1`. That way you can connect to it from inside WSL; otherwise, you would have to install the entire ESP GDB toolchain on the host. To get the IP address of the Windows host, follow [this](https://learn.microsoft.com/en-us/windows/wsl/networking) or simply run `ip route` in WSL and extract it from the line similar to
+
+```
+default via 172.17.240.1 dev eth0 proto kernel
+```
+
+You can try debugging with `telnet` like [this](https://github.com/wuxx/ESPLink):
+
+```
+telnet 172.17.240.1 4444
+```
+
+In the episode, remember to replace `host.docker.internal` with the IP found above.
 
 ## License
 
