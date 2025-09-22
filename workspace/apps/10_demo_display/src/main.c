@@ -1,13 +1,73 @@
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(display);
+
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/display.h>
-#include <lvgl.h>
+//#include <lvgl.h>
 #include <string.h>
 
 // Settings
 static const int32_t sleep_time_ms = 50;        // Target 20 FPS
 
+const struct device *display;
+
+#define DISPLAY_BUFFER_PITCH 128
+
 int main(void)
 {
+    int ret = 0;
+
+    // Initialize the display
+    display = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
+    if (!device_is_ready(display)) {
+        printk("Error: display not ready\r\n");
+        return 0;
+    }
+
+    struct display_capabilities capabilities;
+    display_get_capabilities(display, &capabilities);
+
+    const uint16_t x_res = capabilities.x_resolution;
+    const uint16_t y_res = capabilities.y_resolution;
+
+    LOG_INF("x_resolution: %d", x_res);
+    LOG_INF("y_resolution: %d", y_res);
+    LOG_INF("supported pixel formats: %d", capabilities.supported_pixel_formats);
+    LOG_INF("screen_info: %d", capabilities.screen_info);
+    LOG_INF("current_pixel_format: %d", capabilities.current_pixel_format);
+    LOG_INF("current_orientation: %d", capabilities.current_orientation);
+	 
+    const struct display_buffer_descriptor buf_desc = {
+        .width = x_res,
+        .height = y_res,
+        .buf_size = x_res * y_res,
+        .pitch = DISPLAY_BUFFER_PITCH
+    };
+
+    uint8_t buf[1024] = {0};
+
+    // Fill the screen with line strips of 4 pixels in height
+    for(int i = 0; i < sizeof(buf); i++) {
+        buf[i] = 0x0f;
+    }
+
+    ret = display_write(display, 0, 0, &buf_desc, buf);
+    if (ret != 0) {
+        LOG_ERR("could not write to display: %d", ret);
+        return ret;
+    }
+
+    ret = display_set_contrast(display, 255);
+    if (ret != 0) {
+        LOG_ERR("could not set display contrast, %d", ret);
+        return ret;
+    }
+
+    while (1) {
+        k_msleep(sleep_time_ms);
+    }
+
+#if 0
     uint32_t count = 0;
     char buf[11] = {0};
     const struct device *display;
@@ -80,4 +140,5 @@ int main(void)
         // Sleep
         k_msleep(sleep_time_ms);
     }
+#endif
 }

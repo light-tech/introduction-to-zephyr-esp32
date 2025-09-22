@@ -33,6 +33,7 @@ Some useful VSCode extensions:
 
  1. [WSL]() that allows you to open WSL folder with your native VSCode so that you can browse the files in the Zephyr installation inside WSL
  2. [nRF DeviceTree](https://marketplace.visualstudio.com/items?itemName=nordic-semiconductor.nrf-devicetree) for syntax highlight of device tree files
+ 3. [C/C++]() to do gdb step through debugging graphically
 
 ## Build Application
 
@@ -124,6 +125,7 @@ Now we can connect
 | TDO      | 35       | 15       |
 | TCK      | 37       | 13       |
 | TMS      | 39       | 14       |
+|          | GND      | GND      |
 
 (Refer to the above image for the pin selection in the firmware.)
 
@@ -171,6 +173,20 @@ telnet 172.17.240.1 4444
 ```
 
 In the episode, remember to replace `host.docker.internal` with the IP found above.
+
+## LVGL
+
+The LVGL demo application crashes for me.
+
+Using step through debugging above, it crashes due to nested exception (some Zephyr start-up code written in assembly that is beyond me to fix) long before main function. Commented out the entire `main()` function does not fix the issue but commenting out the `#include <lvgl.h>` prevents the crash so it is definitely caused by some LVGL initialization code.
+
+The cause of the crash could be due to initialization of the hardware as well as I do not have the same LCD module. So to start, let eliminate hardware issue by driving the common working [0.9" OLED display](https://randomnerdtutorials.com/guide-for-oled-display-with-arduino/) *without LVGL*. I found working code in [this video](https://youtu.be/ddZ-04IVrak?list=PLEQVp_6G_y4iFfemAbFsKw6tsGABarTwp)
+
+```
+west build -b esp32_devkitc_wroom/esp32/procpu -- -DDTC_OVERLAY_FILE=boards/esp32_oled.overlay -DEXTRA_CONF_FILE=boards/esp32_oled.conf
+```
+
+(I found out that the 3.3V pin from ESP32 cannot supply enough current to the screen. I need to use an external power supply for it to work.)
 
 ## License
 
