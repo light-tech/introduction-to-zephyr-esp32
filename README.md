@@ -188,6 +188,23 @@ west build -b esp32_devkitc_wroom/esp32/procpu -- -DDTC_OVERLAY_FILE=boards/esp3
 
 (I found out that the 3.3V pin from ESP32 cannot supply enough current to the screen. I need to use an external power supply for it to work.)
 
+Next, let try to render simple shapes (rectangles, circles) on the working OLED using LVGL. (Text are complicated and heavy so let leave them.) This is where one must understand the software and Kconfig.
+
+LGVL is implemented as a Zephyr module. It has two parts:
+
+  * The platform dependent part is located at `zephyrproject/zephyr/modules/lvgl`. This part contains a couple of Zephyr's Kconfig for LVGL and Zephyr implementation of various system functions (memory allocation i.e. how LGVL can do `malloc`) and callback functions (render the bitmap onto the display).
+  
+    These are set up in `lvgl_init()` which is executed in another thread by default unless `CONFIG_LV_Z_AUTO_INIT=n`. This is what I did to debug through the initialization.
+    
+    Zephyr default memory allocator uses a fixed size (`CONFIG_LV_Z_MEM_POOL_SIZE` bytes) heap. Needless to say, it must be sufficiently high (`8192`) since LVGL allocates a lot of objects.
+
+    **For the OLED display we are using**: The config `CONFIG_LV_COLOR_DEPTH_1=y` and `CONFIG_LV_Z_BITS_PER_PIXEL=1` are crucial. This let Zephyr set up the right flush callback to update the screen. Since the screen is small (its entire pixels take up only 1024 bytes), we set `CONFIG_LV_Z_BUFFER_ALLOC_STATIC=y` and
+`CONFIG_LV_Z_MONOCHROME_CONVERSION_BUFFER=y` to optimally use memory.
+
+  * The platform independent part is in `zephyrproject/modules/lib/gui/lvgl`. This is where drawing logic is implemented, the original code of the LVGL project. LVGL has its own Kconfig. For example, we choose `CONFIG_LV_CONF_MINIMAL=y` and `CONFIG_LV_USE_LINE=y` to bring in only the line drawing part of the library.
+
+The major code changes are to call `lvgl_init` ourselves in `main`. Since the screen is monochrome, we cannot use color other than `lv_color_white()` and `lv_color_black()`. (Black is actually cyan and white is black for me.)
+
 ## License
 
 All software in this repository, unless otherwise noted, is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) license.

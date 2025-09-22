@@ -3,12 +3,14 @@ LOG_MODULE_REGISTER(display);
 
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/display.h>
-//#include <lvgl.h>
+#include <lvgl.h>
+#include <lvgl_zephyr.h> // for lvgl_init
 #include <string.h>
 
 // Settings
 static const int32_t sleep_time_ms = 50;        // Target 20 FPS
 
+#if 0
 const struct device *display;
 
 #define DISPLAY_BUFFER_PITCH 128
@@ -66,8 +68,19 @@ int main(void)
     while (1) {
         k_msleep(sleep_time_ms);
     }
+}
 
-#if 0
+#else
+
+int main(void)
+{
+    int ret = lvgl_init();
+    if (ret < 0) {
+        LOG_ERR("could initialize LVGL, %d", ret);
+    }
+
+    LOG_INF("LVGL initialized");
+
     uint32_t count = 0;
     char buf[11] = {0};
     const struct device *display;
@@ -77,8 +90,8 @@ int main(void)
     lv_obj_t *circle;
     lv_style_t rect_style;
     lv_style_t circle_style;
-    lv_point_t rect_points[5] = { {0, 0}, {120, 0}, {120, 20}, {0, 20}, {0, 0} };
-    const uint32_t circle_radius = 15;
+    lv_point_precise_t rect_points[5] = { {20, 20}, {60, 20}, {60, 60}, {20, 60}, {20, 20} };
+    const uint32_t circle_radius = 30;
 
     // Initialize the display
     display = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
@@ -88,18 +101,19 @@ int main(void)
     }
 
     // Create a static label widget
-    hello_label = lv_label_create(lv_scr_act());
-    lv_label_set_text(hello_label, "Hello, World!");
-    lv_obj_align(hello_label, LV_ALIGN_TOP_MID, 0, 5);
+    // hello_label = lv_label_create(lv_scr_act());
+    // lv_label_set_text(hello_label, "Hello, World!");
+    // lv_obj_align(hello_label, LV_ALIGN_TOP_MID, 0, 5);
 
     // Create a dynamic label widget
-    counter_label = lv_label_create(lv_scr_act());
-    lv_obj_align(counter_label, LV_ALIGN_BOTTOM_MID, 0, 0);
+    // counter_label = lv_label_create(lv_scr_act());
+    // lv_obj_align(counter_label, LV_ALIGN_BOTTOM_MID, 0, 0);
 
     // Set line style
     lv_style_init(&rect_style);
-    lv_style_set_line_color(&rect_style, lv_color_hex(0x0000FF));
+    lv_style_set_line_color(&rect_style, lv_color_white()); // lv_color_hex(0x0000FF));
     lv_style_set_line_width(&rect_style, 3);
+    lv_style_set_bg_color(&rect_style, lv_color_black());
 
     // Create a rectangle out of lines
     rect = lv_line_create(lv_scr_act());
@@ -112,8 +126,10 @@ int main(void)
     // Set circle style
     lv_style_init(&circle_style);
     lv_style_set_radius(&circle_style, circle_radius);
+    lv_style_set_border_width(&circle_style, 10);
+    lv_style_set_border_color(&circle_style, lv_color_white());
     lv_style_set_bg_opa(&circle_style, LV_OPA_100);
-    lv_style_set_bg_color(&circle_style, lv_color_hex(0xFF0000));
+    lv_style_set_bg_color(&circle_style, lv_color_black()); // lv_color_hex(0xFF0000));
 
     // Create an object with the new style
     circle = lv_obj_create(lv_scr_act());
@@ -122,17 +138,17 @@ int main(void)
     lv_obj_align(circle, LV_ALIGN_CENTER, 0, 5);
 
     // Disable display blanking
-    display_blanking_off(display);
+    // display_blanking_off(display);
 
     // Do forever
     while (1) {
 
         // Update counter label every second
-        count++;
-        if ((count % (1000 / sleep_time_ms)) == 0) {
-            sprintf(buf, "%d", count / (1000 / sleep_time_ms));
-            lv_label_set_text(counter_label, buf);
-        }
+        // count++;
+        // if ((count % (1000 / sleep_time_ms)) == 0) {
+        //     sprintf(buf, "%d", count / (1000 / sleep_time_ms));
+        //     lv_label_set_text(counter_label, buf);
+        // }
 
         // Must be called periodically
         lv_task_handler();
@@ -140,5 +156,6 @@ int main(void)
         // Sleep
         k_msleep(sleep_time_ms);
     }
-#endif
 }
+
+#endif
