@@ -38,25 +38,40 @@ int main(void)
     LOG_INF("current_orientation: %d", capabilities.current_orientation);
 
     // Draw some simple content on the display
-    /*const struct display_buffer_descriptor buf_desc = {
+    uint8_t buf[1024] = {0};
+    struct display_buffer_descriptor buf_desc = {
         .width = x_res,
         .height = y_res,
-        .buf_size = x_res * y_res,
-        .pitch = DISPLAY_BUFFER_PITCH
+        .buf_size = sizeof(buf), // x_res * y_res,
+        .pitch = x_res // DISPLAY_BUFFER_PITCH
     };
 
-    uint8_t buf[1024] = {0};
+    switch (capabilities.current_pixel_format) {
+    case PIXEL_FORMAT_MONO01:
+    case PIXEL_FORMAT_MONO10:
+        // Fill the screen with line strips of 4 pixels in height
+        for(int i = 0; i < sizeof(buf); i++) {
+            buf[i] = 0x0f;
+        }
+        break;
 
-    // Fill the screen with line strips of 4 pixels in height
-    for(int i = 0; i < sizeof(buf); i++) {
-        buf[i] = 0x0f;
+    case PIXEL_FORMAT_RGB_565:
+    case PIXEL_FORMAT_BGR_565:
+        // We have a buffer of 1024 bytes or 512 x 2 bytes so we can make a bitmap for
+        // a rectangle of size 2^5 x 2^4 or 32 x 16. Fill with white color 0xffff.
+        for(int i = 0; i < sizeof(buf); i++) {
+            buf[i] = 0xff;
+        }
+        buf_desc.width = 32;
+        buf_desc.height = 16;
+        buf_desc.pitch = 32;
+        break;
     }
 
     ret = display_write(display, 0, 0, &buf_desc, buf);
     if (ret != 0) {
         LOG_ERR("could not write to display: %d", ret);
-        return ret;
-    }*/
+    }
 
     ret = display_set_contrast(display, 255);
     if (ret != 0) {
