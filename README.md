@@ -159,6 +159,8 @@ and continue with the episode
 $ZEPHYR_SDK_INSTALL_DIR/xtensa-espressif_esp32_zephyr-elf/bin/xtensa-espressif_esp32_zephyr-elf-gdb build/zephyr/zephyr.elf
 ```
 
+![GDB from WSL Ubuntu terminal](.images/ocd1.jpg)
+
 (Note that we use `esp32` and not `esp32s3`!)
 
 The extra command `bindto` is to instruct `openocd` to listen to all interfaces and not just localhost `127.0.0.1`. That way you can connect to it from inside WSL; otherwise, you would have to install the entire ESP GDB toolchain on the host. To get the IP address of the Windows host, follow [this](https://learn.microsoft.com/en-us/windows/wsl/networking) or simply run `ip route` in WSL and extract it from the line similar to
@@ -178,6 +180,8 @@ In the episode, remember to replace `host.docker.internal` with the IP found abo
 ```
 target extended-remote 172.17.240.1:3333
 ```
+
+![Graphical GDB from VS Code](.images/ocd2.jpg)
 
 ## LVGL
 
@@ -232,7 +236,7 @@ west build -b esp32_devkitc_wroom/esp32/procpu -- -DDTC_OVERLAY_FILE=boards/esp3
 
 and here is my final result:
 
-![LGVL](.images/lgvl.png)
+![LGVL](.images/lgvl.jpg)
 
 ## License
 
