@@ -61,11 +61,13 @@ int main(void)
     ret = display_set_contrast(display, 255);
     if (ret != 0) {
         LOG_ERR("could not set display contrast, %d", ret);
-        return ret;
+        // ST7735R driver do not provide set_contrast API so this will return -ENOSYS
+        // Avoid return ret; to jump into the infinite loop; else it's just CPU idle forever
     }
 
     while (1) {
-        k_msleep(sleep_time_ms);
+        LOG_ERR("Looping indefinitely");
+        k_msleep(50 * sleep_time_ms);
     }
 }
 
