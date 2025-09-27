@@ -3,15 +3,13 @@ LOG_MODULE_REGISTER(display);
 
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/display.h>
-#include <lvgl.h>
-#include <lvgl_zephyr.h> // for lvgl_init
-#include <string.h>
 
 // Settings
 static const int32_t sleep_time_ms = 50;        // Target 20 FPS
 
-#if 0
-const struct device *display;
+#if !CONFIG_LVGL // Check if we can interact with the screen using Zephyr standard display API, no LGVL
+
+const struct device *display = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 
 #define DISPLAY_BUFFER_PITCH 128
 
@@ -20,12 +18,12 @@ int main(void)
     int ret = 0;
 
     // Initialize the display
-    display = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
     if (!device_is_ready(display)) {
         printk("Error: display not ready\r\n");
-        return 0;
+        return -1;
     }
 
+    // Check the display information (width, height, color format, ...)
     struct display_capabilities capabilities;
     display_get_capabilities(display, &capabilities);
 
@@ -38,8 +36,9 @@ int main(void)
     LOG_INF("screen_info: %d", capabilities.screen_info);
     LOG_INF("current_pixel_format: %d", capabilities.current_pixel_format);
     LOG_INF("current_orientation: %d", capabilities.current_orientation);
-	 
-    const struct display_buffer_descriptor buf_desc = {
+
+    // Draw some simple content on the display
+    /*const struct display_buffer_descriptor buf_desc = {
         .width = x_res,
         .height = y_res,
         .buf_size = x_res * y_res,
@@ -57,7 +56,7 @@ int main(void)
     if (ret != 0) {
         LOG_ERR("could not write to display: %d", ret);
         return ret;
-    }
+    }*/
 
     ret = display_set_contrast(display, 255);
     if (ret != 0) {
@@ -70,7 +69,11 @@ int main(void)
     }
 }
 
-#else
+#else // CONFIG_LVGL
+
+#include <lvgl.h>
+#include <lvgl_zephyr.h> // for lvgl_init
+#include <string.h>
 
 int main(void)
 {
@@ -158,4 +161,4 @@ int main(void)
     }
 }
 
-#endif
+#endif // !CONFIG_LVGL
