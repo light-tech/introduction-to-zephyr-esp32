@@ -1,0 +1,46 @@
+#include <zephyr/dt-bindings/mipi_dbi/mipi_dbi.h>
+
+/ {
+    chosen {
+        zephyr,display = &st7789v_240x240;
+    };
+
+    mipi_dbi {
+        compatible = "zephyr,mipi-dbi-spi";
+        spi-dev = <&spi3>;
+        dc-gpios = <&gpio0 21 GPIO_ACTIVE_HIGH>;
+        reset-gpios = <&gpio0 22 GPIO_ACTIVE_LOW>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+		// From https://adafruit-playground.com/u/SamBlenny/pages/zephyr-quest-st7789-display-with-feather-rp2350
+		// See also https://devzone.nordicsemi.com/f/nordic-q-a/116909/working-devicetree-for-st7789v-display
+        st7789v_240x240: st7789v@0 {
+            compatible = "sitronix,st7789v";
+			reg = <0>;
+			mipi-max-frequency = <1000000>; /* 1 MHz */
+			mipi-mode = "MIPI_DBI_MODE_SPI_4WIRE";
+			x-offset = <0>;
+			y-offset = <0>;
+			height = <240>;  /* Y range is 0..239 */
+			width  = <240>;  /* X range is 0..239 */
+
+			/* These values copied from CircuitPython init sequence */
+			colmod   = <0x55>;  /* 16-bit 5-6-5 */
+			mdac     = <0x0C>;
+
+			/* Set required properties to defaults from ST7789V datasheet */
+			vcom     = <0x20>;
+			gctrl    = <0x35>;
+			lcm      = <0x2C>;
+			gamma    = <0x01>;
+			porch-param   = [0C 0C 00 33 33];
+			cmd2en-param  = [5A 69 02 00];
+			pwctrl1-param = [A4 81];
+			pvgam-param   = [d0 00 02 07 0b 1a 31 54 40 29 12 12 12 17];
+			nvgam-param   = [d0 00 02 07 05 25 2d 44 44 1c 18 16 1c 1d];
+			ram-param     = [00 f0];
+			rgb-param     = [40 02 14];
+        };
+    };
+};
