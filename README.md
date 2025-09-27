@@ -210,6 +210,30 @@ LGVL is implemented as a Zephyr module. It has two parts:
 
 The major code changes are to call `lvgl_init` ourselves in `main`. Since the screen is monochrome, we cannot use color other than `lv_color_white()` and `lv_color_black()`. (Black is actually cyan and white is black for me.)
 
+The next checkpoint is to get the colorful LCD working. All the hard work is done. Here I switch to `spi3` (with default pin control) as the pins for SPI2 clashes with the JTAG ones.
+
+| ESP32     | ST7735 LCD | Extenal Power Supply |
+| :-------  | :--------: | -------------------: |
+| GND       | GND        | GND                  |
+|           | VCC        | 3.3V                 |
+| 18 (SCLK) | SCL        |                      |
+| 19 (MISO) |            |                      |
+| 23 (MOSI) | SDA        |                      |
+| 1         | RES        |                      |
+| 3         | DC         |                      |
+| 5  (CSEL) | CS         |                      |
+|           | BLK        |                      |
+
+Building and flashing
+
+```
+west build -b esp32_devkitc_wroom/esp32/procpu -- -DDTC_OVERLAY_FILE=boards/esp32s3_devkitc.overlay -DEXTRA_CONF_FILE=boards/esp32s3_devkitc.conf
+```
+
+and here is my final result:
+
+![LGVL](.images/lgvl.png)
+
 ## License
 
 All software in this repository, unless otherwise noted, is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) license.

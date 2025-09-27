@@ -7,9 +7,9 @@
 
     mipi_dbi {
         compatible = "zephyr,mipi-dbi-spi";
-        spi-dev = <&spi2>;
-        dc-gpios = <&gpio0 18 GPIO_ACTIVE_HIGH>;
-        reset-gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
+        spi-dev = <&spi3>; // use spi3 since spi2 pins are for JTAG debugging
+        dc-gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
+        reset-gpios = <&gpio0 3 GPIO_ACTIVE_LOW>;
         #address-cells = <1>;
         #size-cells = <0>;
 
@@ -17,7 +17,7 @@
             compatible = "sitronix,st7735r";
             reg = <0>;
             mipi-max-frequency = <20000000>;
-			mipi-mode = <MIPI_DBI_MODE_SPI_4WIRE>;
+			mipi-mode = "MIPI_DBI_MODE_SPI_4WIRE";
 			reg = <0>;
 			width = <160>;
 			height = <80>;
@@ -44,23 +44,4 @@
 			raset = [00 1a 00 69];
         };
     };
-};
-
-&spi2 {
-    pinctrl-0 = <&spi2_custom_pins>;
-    status = "okay";
-};
-
-&pinctrl {
-    spi2_custom_pins: spi2_custom_pins {
-		group1 {
-			pinmux = <SPIM2_MISO_GPIO11>,
-				 <SPIM2_SCLK_GPIO12>,
-				 <SPIM2_CSEL_GPIO9>;
-		};
-		group2 {
-			pinmux = <SPIM2_MOSI_GPIO10>;
-			output-low;
-		};
-	};
 };
