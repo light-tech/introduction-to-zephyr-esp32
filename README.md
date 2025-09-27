@@ -125,6 +125,7 @@ Now we can connect
 | TDO      | 35       | 15       |
 | TCK      | 37       | 13       |
 | TMS      | 39       | 14       |
+| RST      | 5        | EN       |
 |          | GND      | GND      |
 
 (Refer to the above image for the pin selection in the firmware.)
@@ -172,7 +173,11 @@ You can try debugging with `telnet` like [this](https://github.com/wuxx/ESPLink)
 telnet 172.17.240.1 4444
 ```
 
-In the episode, remember to replace `host.docker.internal` with the IP found above.
+In the episode, remember to replace `host.docker.internal` with the IP found above. In my case, it would be
+
+```
+target extended-remote 172.17.240.1:3333
+```
 
 ## LVGL
 
