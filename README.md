@@ -236,7 +236,7 @@ west build -b esp32_devkitc_wroom/esp32/procpu -- -DDTC_OVERLAY_FILE=boards/esp3
 
 and here is my final result:
 
-![LGVL](.images/lgvl.jpg)
+![LGVL](.images/lvgl.jpg)
 
 ## License
 
