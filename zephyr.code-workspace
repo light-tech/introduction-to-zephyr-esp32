@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "./workspace"
+		},
+		{
+			"path": "../../../../home/anon/zephyrproject/zephyr"
+		},
+		{
+			"path": "../../../../home/anon/zephyrproject/modules"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"kernel.h": "c",
+			"log.h": "c",
+			"display.h": "c",
+			"lvgl.h": "c"
+		},
+		"remote.WSL.downloadInBackground": false
+	}
+}

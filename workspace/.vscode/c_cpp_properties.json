@@ -3,13 +3,13 @@
         {
             "name": "Zephyr Dev Container",
             "includePath": [
-                "${workspaceFolder:/workspace}/**",  // Refers to /workspace
-                "${workspaceFolder:/opt/toolchains/zephyr}/**"    // Refers to /opt/toolchains/zephyr
+                ".",
+                "/home/anon/zephyrproject/zephyr/include",
+                "/home/anon/zephyrproject/zephyr/modules/lvgl/include",
+                "/home/anon/zephyrproject/modules/lib/gui/lvgl"
             ],
             "browse": {
                 "path": [
-                    "${workspaceFolder:/workspace}/**",
-                    "${workspaceFolder:/opt/toolchains/zephyr}/**"
                 ],
                 "limitSymbolsToIncludedHeaders": true
             },
