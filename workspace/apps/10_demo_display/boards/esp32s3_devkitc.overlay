@@ -8,8 +8,8 @@
     mipi_dbi {
         compatible = "zephyr,mipi-dbi-spi";
         spi-dev = <&spi3>; // use spi3 since spi2 pins are for JTAG debugging
-        dc-gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
-        reset-gpios = <&gpio0 3 GPIO_ACTIVE_LOW>;
+        dc-gpios = <&gpio0 21 GPIO_ACTIVE_HIGH>;
+        reset-gpios = <&gpio0 22 GPIO_ACTIVE_LOW>;
         #address-cells = <1>;
         #size-cells = <0>;
 

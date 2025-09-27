@@ -185,7 +185,7 @@ target extended-remote 172.17.240.1:3333
 
 ## LVGL
 
-The LVGL demo application crashes for me.
+The LVGL demo application _"crashes"_ for me.
 
 Using step through debugging above, it crashes due to nested exception (some Zephyr start-up code written in assembly that is beyond me to fix) long before main function. Commented out the entire `main()` function does not fix the issue but commenting out the `#include <lvgl.h>` prevents the crash so it is definitely caused by some LVGL initialization code.
 
@@ -223,10 +223,12 @@ The next checkpoint is to get the colorful LCD working. All the hard work is don
 | 18 (SCLK) | SCL        |                      |
 | 19 (MISO) |            |                      |
 | 23 (MOSI) | SDA        |                      |
-| 1         | RES        |                      |
-| 3         | DC         |                      |
+| 22        | RES        |                      |
+| 21        | DC         |                      |
 | 5  (CSEL) | CS         |                      |
 |           | BLK        |                      |
+
+**Lesson**: Avoid using GPIO1 and GPIO3 as those are [`uart0` pins](https://dl.espressif.com/dl/schematics/esp32_devkitc_v4-sch.pdf) connected to the CP2102 to convert to USB. Using them will conflict with the shell/logging console! In my case, the ST7735 driver uses them do drive DC/RST signals and so inadvertently output `NUL` (`\0`) characters to UART making it look like the miniterm crashes.
 
 Building and flashing
 
