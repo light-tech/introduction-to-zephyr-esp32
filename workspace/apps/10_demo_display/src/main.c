@@ -77,6 +77,14 @@ int main(void)
         // Avoid return ret; to jump into the infinite loop; else it's just CPU idle forever
     }
 
+#if CONFIG_ST7789V
+    // Disable display blanking
+    ret = display_blanking_off(display);
+    if (ret != 0) {
+        LOG_ERR("could not resume display, %d", ret);
+    }
+#endif
+
     while (1) {
         LOG_ERR("Looping indefinitely");
         k_msleep(50 * sleep_time_ms);
@@ -107,7 +115,7 @@ int main(void)
     lv_obj_t *circle;
     lv_style_t rect_style;
     lv_style_t circle_style;
-    lv_point_precise_t rect_points[5] = { {20, 20}, {60, 20}, {60, 60}, {20, 60}, {20, 20} };
+    lv_point_precise_t rect_points[5] = { {0, 0}, {120, 0}, {120, 120}, {0, 120}, {0, 0} };
     const uint32_t circle_radius = 30;
 
     // Initialize the display
@@ -154,8 +162,10 @@ int main(void)
     lv_obj_add_style(circle, &circle_style, 0);
     lv_obj_align(circle, LV_ALIGN_CENTER, 0, 5);
 
+#if CONFIG_ST7789V
     // Disable display blanking
-    // display_blanking_off(display);
+    display_blanking_off(display);
+#endif
 
     // Do forever
     while (1) {
