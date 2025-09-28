@@ -38,7 +38,15 @@ int main(void)
     LOG_INF("current_orientation: %d", capabilities.current_orientation);
 
     // Draw some simple content on the display
+    // For monoschrome 128x64 screen, we fill the screen with line strips of 4 pixels in height.
+    // For 16-bit color display, we have a buffer of 1024 bytes or 512 pixels so we prepare a
+    // bitmap for a rectangle of size 2^5 x 2^4 or 32 x 16 filled with color 0x0f0f. Avoid 0x0000
+    // and 0xffff since the display could be inverted and we see nothing.
     uint8_t buf[1024] = {0};
+    for(int i = 0; i < sizeof(buf); i++) {
+        buf[i] = 0x0f;
+    }
+
     struct display_buffer_descriptor buf_desc = {
         .width = x_res,
         .height = y_res,
@@ -47,24 +55,13 @@ int main(void)
     };
 
     switch (capabilities.current_pixel_format) {
-    case PIXEL_FORMAT_MONO01:
-    case PIXEL_FORMAT_MONO10:
-        // Fill the screen with line strips of 4 pixels in height
-        for(int i = 0; i < sizeof(buf); i++) {
-            buf[i] = 0x0f;
-        }
-        break;
-
     case PIXEL_FORMAT_RGB_565:
     case PIXEL_FORMAT_BGR_565:
-        // We have a buffer of 1024 bytes or 512 x 2 bytes so we can make a bitmap for
-        // a rectangle of size 2^5 x 2^4 or 32 x 16. Fill with white color 0xffff.
-        for(int i = 0; i < sizeof(buf); i++) {
-            buf[i] = 0xff;
-        }
         buf_desc.width = 32;
         buf_desc.height = 16;
         buf_desc.pitch = 32;
+        break;
+    default:
         break;
     }
 
