@@ -236,9 +236,10 @@ Building and flashing
 west build -b esp32_devkitc_wroom/esp32/procpu -- -DDTC_OVERLAY_FILE=boards/esp32s3_devkitc.overlay -DEXTRA_CONF_FILE=boards/esp32s3_devkitc.conf
 ```
 
-and here is my final result:
+and here is my final result on an ST7735 (80x160) and an ST7789 (240x240) screen:
 
 ![LGVL](.images/lvgl.jpg)
+![ST7789](.images/lvgl_st7789.jpeg)
 
 ## License
 
