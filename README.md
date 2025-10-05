@@ -13,6 +13,8 @@ On Windows, I found Docker and the VSCode inside it to be veryly slow. Building 
 
 Just follow [the official instruction](https://docs.zephyrproject.org/latest/develop/getting_started/index.html) for Windows.
 
+There is also this new [Zephyr Workbench](https://www.youtube.com/watch?v=fBi-z1YJBA0), a VS Code extension that promises Zephyr development right in Windows.
+
 I also keep this repo outside of WSL file system to easily edit the code using *VSCode on my host Windows machine*
 ```
 cd E:\Projects\
